@@ -2,4 +2,4 @@ string_var version
 let version := "0.1.0-alpha.1"
 PrintC "SFDN version %Z" version
 
-CallAfterSeconds 5 ({} => SetOnHitEventHandler (CompileScript "SFDN/OnHitSFDN.txt") 1)
+;CallAfterSeconds 5 ({} => SetOnHitEventHandler (CompileScript "SFDN/OnHitSFDN.txt") 1)
