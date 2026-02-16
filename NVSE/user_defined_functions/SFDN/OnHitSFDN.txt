@@ -1,0 +1,53 @@
+scn	OnHitUDF
+
+
+ref	rTarget
+begin Function {} ;Entry
+	let rTarget := this
+	if rTarget == player 
+		return
+	endif
+end
+
+int iDrawX
+int iDrawY
+begin Function ;Hit coordinates to screen coordinates
+	let array_var aHit3DData := rTarget.GetHit3DData 0
+	let float fHitX := aHit3DData[0]
+	let float fHitY := aHit3DData[1]
+	let float fHitZ := aHit3DData[2]
+
+	int xOut
+	int yOut
+	int zOut
+	let int isOnScreen := WorldToScreen (xOut) (yOut) (zOut) (fHitX) (fHitY) (fHitZ) 0 
+
+	let float fScreenResolutionWidth := GetScreenTrait 0
+	let float fScreenResolutionHeight := GetScreenTrait 1
+	let iDrawX := fScreenResolutionWidth * xOut
+	let iDrawY := fScreenResolutionHeight * yOut
+end
+
+
+Begin Function ; Inject floating number into HUD
+	let string_var sFloatingNumberXML := Sv_Construct "<rect name=%qdamageNumberContainer%q> <_DamageNumber>%g</_DamageNumber> <text name=%qdamageNumberText%q> <String> <copy src=%qparent()%q trait=%q_DamageNumber%q/> </String> <x>0</x> <y>0</y> <alpha>0</alpha> <zoom>0</zoom> </text> </rect>" (rTarget.GetHitHealthDamage)
+	InjectUIComponent "HUDMainMenu" "%Z" sFloatingNumberXML
+end
+
+; string_var sParameter
+; Begin Function ; Animation lambda
+; 	let ref rAnimationLambda := (begin Function { sParameter }
+; 		PrintC "Animation lambda called with parameter: %Z" sParameter
+; 	end)
+; end
+
+Begin Function ; Animate floating number
+	SetUIFloatAlt "HUDMainMenu\damageNumberContainer\damageNumberText\x" iDrawX 
+	SetUIFloatAlt "HUDMainMenu\damageNumberContainer\damageNumberText\y" iDrawY 
+	SetUIFLoatGradual "HUDMainMenu\damageNumberContainer\damageNumberText\zoom" 100 20 1
+	SetUIFLoatGradual "HUDMainMenu\damageNumberContainer\damageNumberText\alpha" 255 0 1
+end
+
+Begin Function ;Clean up
+	CallAfterSeconds 1 ({} => UnloadUIComponent "HUDMainMenu\damageNumberContainer")
+end
