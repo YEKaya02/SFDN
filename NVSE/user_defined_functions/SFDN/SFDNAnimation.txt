@@ -1,6 +1,117 @@
-int iDrawX
-int iDrawY
-Begin Function { iDrawX, iDrawY }
-    SetUIFloatAlt "HUDMainMenu\damageNumberContainer\damageNumberText\x" iDrawX
-    SetUIFloatAlt "HUDMainMenu\damageNumberContainer\damageNumberText\y" iDrawY
-end
+; int iDrawX
+; int iDrawY
+; int iOffset
+; Begin Function { iDrawX, iDrawY, iOffset }
+;     let int iIterations
+;     let int iCalculatedX
+;     let int iCalculatedY
+;     let iCalculatedX := iDrawX + iIterations * 10
+;     let iCalculatedY := iDrawY + iIterations * 10
+;     ;PrintV iDrawX
+;     ;PrintV iDrawY
+;     ;PrintV iCalculatedX
+;     ;PrintV iCalculatedY
+
+;     SetUIFloatAlt "HUDMainMenu\damageNumberContainer\damageNumberText\x" iCalculatedX
+;     SetUIFloatAlt "HUDMainMenu\damageNumberContainer\damageNumberText\y" iCalculatedY
+;     Call rSFDNAnimation iDrawX iDrawY iOffset + 10
+; end
+
+; float fTime
+; float fDuration
+; float fXStart
+; float fYStart
+; float fVX
+; float fVY
+; float fGravity
+; int iDrawX
+; int iDrawY
+
+; Begin Function { iDrawX, iDrawY }
+
+;     let fXStart := iDrawX
+;     let fYStart := iDrawY
+
+;     let fDuration := 0.8
+;     let fTime := 0
+
+;     ; arc tuning
+;     let fVX := 0           ; no horizontal drift (change if wanted)
+;     let fVY := 120         ; upward push
+;     let fGravity := 200    ; downward pull
+
+;     While fTime < fDuration
+
+;         let float fX := fXStart + fVX * fTime
+;         let float fY := fYStart - (fVY * fTime - fGravity * fTime * fTime)
+
+;         SetUIFloatAlt "HUDMainMenu\damageNumberContainer\damageNumberText\x" fX
+;         SetUIFloatAlt "HUDMainMenu\damageNumberContainer\damageNumberText\y" fY
+
+;         ; Fade out gradually
+;         let float fAlpha := 255 * (1 - (fTime / fDuration))
+;         SetUIFloatAlt "HUDMainMenu\damageNumberContainer\damageNumberText\alpha" fAlpha
+
+;         let fTime += 0.03
+;         CallAfterSeconds 0.03 ({})
+
+;     Loop
+
+; End
+
+; Begin Function ; Animation
+;     let float fStartX := iDrawX
+;     let float fStartY := iDrawY
+
+;     let float fTime := 0
+;     let float fDuration := 0.5
+;     let float fHeight := 50
+    
+;     let int iRandomDirection := GetRandomInRange 0 2
+
+;     let ref rAnimationLambda := (begin Function { }
+;         let fTime += 0.016
+;         let float fT := fTime / fDuration
+
+;         if fT > 1
+;             return
+;         endif
+
+;         if iRandomDirection
+;             let iDrawX := fStartX + (50 * fT)
+;         else
+;             let iDrawX := fStartX - (50 * fT)
+;         endif
+;         let iDrawY := fStartY - (fHeight * 4 * fT * (1 - fT))
+
+;         SetUIFloat "HUDMainMenu\damageNumberContainer\damageNumberText\x" iDrawX
+;         SetUIFloat "HUDMainMenu\damageNumberContainer\damageNumberText\y" iDrawY
+;     end)
+
+;     CallForSeconds 1 rAnimationLambda 0
+; End
+
+; Begin Function { fStartX, fStartY, fTime, fDuration, fHeight, iRandomDirection }
+
+;     let fTime += 0.016
+;     let float fT := fTime / fDuration
+
+;     if fT > 1
+;         return
+;     endif
+
+;     if iRandomDirection
+;         let float fDrawX := fStartX + (50 * fT)
+;     else
+;         let float fDrawX := fStartX - (50 * fT)
+;     endif
+
+;     let float fDrawY := fStartY - (fHeight * 4 * fT * (1 - fT))
+
+;     SetUIFloat "HUDMainMenu\damageNumberContainer\damageNumberText\x" fDrawX
+;     SetUIFloat "HUDMainMenu\damageNumberContainer\damageNumberText\y" fDrawY
+
+;     ; schedule next frame
+;     CallForSeconds 0 SFDNAnimation fStartX fStartY fTime fDuration fHeight iRandomDirection
+
+; End
