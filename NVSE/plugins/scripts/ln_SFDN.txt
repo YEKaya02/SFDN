@@ -2,4 +2,16 @@ string_var version
 let version := "0.1.0-alpha.1"
 PrintC "SFDN version %Z" version
 
-;CallAfterSeconds 5 ({} => SetOnHitEventHandler (CompileScript "SFDN/OnHitSFDN.txt") 1)
+SetOnHitEventHandler (CompileScript "SFDN/OnHitSFDN.txt") 1
+;({} => SetOnHitEventHandler (CompileScript "SFDN/OnHitSFDN.txt") 1)
+
+; int iKeyCode
+; let ref rOnHitSFDN := CompileScript "SFDN/OnHitSFDN.txt" 1
+; SetOnHitEventHandler rOnHitSFDN 1
+
+; SetEventHandler "OnKeyUp:66" (begin Function { iKeyCode }
+;     SetOnHitEventHandler rOnHitSFDN 0
+;     let rOnHitSFDN := CompileScript "SFDN/OnHitSFDN.txt" 1
+;     SetOnHitEventHandler rOnHitSFDN 1
+;     PrintC "SFDN Hot reloaded"
+;     end)

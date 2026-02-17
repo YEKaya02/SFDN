@@ -1,0 +1,6 @@
+int iDrawX
+int iDrawY
+Begin Function { iDrawX, iDrawY }
+    SetUIFloatAlt "HUDMainMenu\damageNumberContainer\damageNumberText\x" iDrawX
+    SetUIFloatAlt "HUDMainMenu\damageNumberContainer\damageNumberText\y" iDrawY
+end

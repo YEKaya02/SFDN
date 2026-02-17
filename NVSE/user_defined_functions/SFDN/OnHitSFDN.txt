@@ -1,10 +1,7 @@
-scn	OnHitUDF
-
-
 ref	rTarget
 begin Function {} ;Entry
 	let rTarget := this
-	if rTarget == player 
+	if rTarget == player || rTarget.getDead
 		return
 	endif
 end
@@ -20,7 +17,7 @@ begin Function ;Hit coordinates to screen coordinates
 	int xOut
 	int yOut
 	int zOut
-	let int isOnScreen := WorldToScreen (xOut) (yOut) (zOut) (fHitX) (fHitY) (fHitZ) 0 
+	let int isOnScreen := WorldToScreen (xOut) (yOut) (zOut) fHitX fHitY fHitZ 0 
 
 	let float fScreenResolutionWidth := GetScreenTrait 0
 	let float fScreenResolutionHeight := GetScreenTrait 1
@@ -30,21 +27,38 @@ end
 
 
 Begin Function ; Inject floating number into HUD
-	let string_var sFloatingNumberXML := Sv_Construct "<rect name=%qdamageNumberContainer%q> <_DamageNumber>%g</_DamageNumber> <text name=%qdamageNumberText%q> <String> <copy src=%qparent()%q trait=%q_DamageNumber%q/> </String> <x>0</x> <y>0</y> <alpha>0</alpha> <zoom>0</zoom> </text> </rect>" (rTarget.GetHitHealthDamage)
+    let float fDamageNumber := rTarget.GetHitHealthDamage 
+	let string_var sFloatingNumberXML := Sv_Construct "<rect name=%qdamageNumberContainer%q> <_DamageNumber>%g</_DamageNumber> <text name=%qdamageNumberText%q> <String> <copy src=%qparent()%q trait=%q_DamageNumber%q/> </String> <x>0</x> <y>0</y> <alpha>0</alpha> <zoom>0</zoom> </text> </rect>" fDamageNumber
 	InjectUIComponent "HUDMainMenu" "%Z" sFloatingNumberXML
 end
 
-; string_var sParameter
-; Begin Function ; Animation lambda
-; 	let ref rAnimationLambda := (begin Function { sParameter }
-; 		PrintC "Animation lambda called with parameter: %Z" sParameter
-; 	end)
+; Begin Function ; Animation
+;     let float fStartX := iDrawX
+;     let float fStartY := iDrawY
+
+;     let float fTime := 0
+;     let float fDuration := 0.5
+;     let float fHeight := 50
+
+;     CallForSeconds 1 SFDNAnimation 1 fStartX fStartY fTime fDuration fHeight
+; 	SetUIFloat "HUDMainMenu\damageNumberContainer\damageNumberText\x" 100
+;     SetUIFloat "HUDMainMenu\damageNumberContainer\damageNumberText\y" 100
+; End
+
+; Begin Function ; Animation
+; 	Call SFDNAnimation iDrawX iDrawY
 ; end
 
+Begin Function
+	;let ref rSFDNAnimation := CompileScript "SFDN/SFDNAnimation.txt" 1
+	let ref rSFDNAnimation := CompileScript "SFDN/SFDNAnimation.txt" 0
+	CallAfterSeconds 0 rSFDNAnimation 0 iDrawX iDrawY
+end
+
 Begin Function ; Animate floating number
-	SetUIFloatAlt "HUDMainMenu\damageNumberContainer\damageNumberText\x" iDrawX 
-	SetUIFloatAlt "HUDMainMenu\damageNumberContainer\damageNumberText\y" iDrawY 
-	SetUIFLoatGradual "HUDMainMenu\damageNumberContainer\damageNumberText\zoom" 100 20 1
+	; SetUIFloatAlt "HUDMainMenu\damageNumberContainer\damageNumberText\x" iDrawX
+    ; SetUIFloatAlt "HUDMainMenu\damageNumberContainer\damageNumberText\y" iDrawY
+	SetUIFLoatGradual "HUDMainMenu\damageNumberContainer\damageNumberText\zoom" 100 20 1 
 	SetUIFLoatGradual "HUDMainMenu\damageNumberContainer\damageNumberText\alpha" 255 0 1
 end
 
