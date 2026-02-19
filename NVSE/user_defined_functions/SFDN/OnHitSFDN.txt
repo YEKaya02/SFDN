@@ -9,6 +9,13 @@ begin Function {} ;Entry
 	PrintC "Hit!!"
 end
 
+int iTestCount := 0
+
+Begin Function ; On hit
+    let iTestCount += 1
+    PrintV iTestCount
+end
+
 int iDrawX
 int iDrawY
 float fScreenResolutionWidth
@@ -31,11 +38,24 @@ begin Function ;Hit coordinates to screen coordinates
 end
 
 ; todo: make a uuid like number for this
+string_var sUIElementPath
+string_var sUIElement
 Begin Function ; Inject floating number into HUD
     let float fDamageNumber := rTarget.GetHitHealthDamage 
-	let string_var sFloatingNumberXML := Sv_Construct "<rect name=%qdamageNumberContainer%q> <_DamageNumber>%g</_DamageNumber> <text name=%qdamageNumberText%q> <String> <copy src=%qparent()%q trait=%q_DamageNumber%q/> </String> <x>0</x> <y>0</y> <alpha>0</alpha> <zoom>0</zoom> </text> </rect>" fDamageNumber
+	let int iUID := GetRandomInRange 100000 999999
+	let string_var sFloatingNumberXML := Sv_Construct "<rect name=%qdamageNumberContainer_%g%q> <_DamageNumber>%g</_DamageNumber> <text name=%qdamageNumberText%q> <String> <copy src=%qparent()%q trait=%q_DamageNumber%q/> </String> <x>0</x> <y>0</y> <alpha>255</alpha> <zoom>100</zoom> </text> </rect>" iUID fDamageNumber
 	InjectUIComponent "HUDMainMenu" "%Z" sFloatingNumberXML
+	let sUIElement := Sv_Construct "HUDMainMenu\damageNumberContainer_%g" iUID
+	let sUIElementPath := Sv_Construct "HUDMainMenu\damageNumberContainer_%g\damageNumberText" iUID
 end
+
+; Begin Function
+; 	let string_var sTestX := Sv_Construct "%Z\x" sUIElementPath
+; 	let string_var sTestY := Sv_Construct "%Z\y" sUIElementPath
+; 	SetUIFloatAlt ((Sv_Construct "%Z\x" sUIElementPath)) iDrawX
+; 	SetUIFloatAlt ((Sv_Construct "%Z\y" sUIElementPath)) iDrawY
+; end
+
 
 Begin Function ; Animation
     let float fStartX := iDrawX
@@ -68,8 +88,8 @@ Begin Function ; Animation
         let iDrawX := fStartX + (fWidth * fT)
         let iDrawY := fStartY - (fHeight * 4 * fT * (1 - fT))
 
-        SetUIFloat "HUDMainMenu\damageNumberContainer\damageNumberText\x" iDrawX
-        SetUIFloat "HUDMainMenu\damageNumberContainer\damageNumberText\y" iDrawY
+		SetUIFloatAlt ((Sv_Construct "%Z\x" sUIElementPath)) iDrawX
+		SetUIFloatAlt ((Sv_Construct "%Z\y" sUIElementPath)) iDrawY
     end)
 
 	CallForSeconds fAnimationDuration rUpdatePositionLambda 1
@@ -77,10 +97,10 @@ Begin Function ; Animation
 End
 
 Begin Function ; Animate floating number
-	SetUIFLoatGradual "HUDMainMenu\damageNumberContainer\damageNumberText\zoom" 100 20 1 
-	SetUIFLoatGradual "HUDMainMenu\damageNumberContainer\damageNumberText\alpha" 255 0 1
+	SetUIFLoatGradual ((Sv_Construct "%Z\zoom" sUIElementPath)) 100 20 1 
+	SetUIFLoatGradual ((Sv_Construct "%Z\alpha" sUIElementPath)) 255 0 1
 end
 
 Begin Function ;Clean up
-	CallAfterSeconds fAnimationDuration ({} => UnloadUIComponent "HUDMainMenu\damageNumberContainer\damageNumberText")
+	CallAfterSeconds fAnimationDuration ({} => UnloadUIComponent (sUIElement))
 end
